@@ -6,29 +6,35 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
-    container:
-      image: llvm/clang:latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+    - name: Checkout kernel source
+      uses: actions/checkout@v4
 
-      - name: Android kernel build with Clang
-        uses: lemniskett/android-kernel-actions@master
-        id: build
-        env:
-          NAME: Loganysl
-        with:
-          arch: arm64
-          compiler: clang
-          defconfig: tb8168p1_64_bsp_defconfig
-          image: Image.gz-dtb
+    - name: Install Clang
+      run: |
+        sudo apt update
+        sudo apt install -y clang
 
-      - name: Upload Kernel and Module
-        uses: actions/upload-artifact@v4
-        with:
-          name: kernelandmodule
-          path: |
-            ${{ steps.build.outputs.outfile }}
-            ./out/drivers/memkernel/memkernel.ko
+    - name: Set Clang as default
+      run: |
+        sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-12 100
+        sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-12 100
+
+    - name: Android kernel build with Clang
+      uses: lemniskett/android-kernel-actions@master
+      id: build
+      env:
+        NAME: Loganysl
+      with:
+        arch: arm64
+        compiler: clang
+        defconfig: tb8168p1_64_bsp_defconfig
+        image: Image.gz-dtb
+
+    - name: Upload Kernel and Module
+      uses: actions/upload-artifact@v4
+      with:
+        name: kernelandmodule
+        path: |
+          ${{ steps.build.outputs.outfile }}
+          ./out/drivers/memkernel/memkernel.ko
