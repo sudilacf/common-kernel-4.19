@@ -21,7 +21,7 @@ jobs:
         NAME: Loganysl
       with:
         arch: arm64
-        compiler: clang/12
+        compiler: gcc/14
         defconfig: tb8168p1_64_bsp_defconfig
         image: Image.gz-dtb
 
