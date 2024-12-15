@@ -1,4 +1,4 @@
-name: Kernel Build with Clang
+name: Kernel Build
 
 on:
   workflow_dispatch:
@@ -10,24 +10,18 @@ jobs:
     - name: Checkout kernel source
       uses: actions/checkout@v4
 
-    - name: Install Clang
+    - name: Set up MemKernel as a module (M-OUT) with specified name
       run: |
-        sudo apt update
-        sudo apt install -y clang
+        curl -LSs "https://raw.githubusercontent.com/Poko-Apps/MemKernel/main/kernel/setup.sh" | bash -s M nazg
 
-    - name: Set Clang as default
-      run: |
-        sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-12 100
-        sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-12 100
-
-    - name: Android kernel build with Clang
+    - name: Android kernel build
       uses: lemniskett/android-kernel-actions@master
       id: build
       env:
         NAME: Loganysl
       with:
         arch: arm64
-        compiler: clang
+        compiler: clang/16
         defconfig: tb8168p1_64_bsp_defconfig
         image: Image.gz-dtb
 
